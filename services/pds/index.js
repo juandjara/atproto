@@ -22,9 +22,10 @@ const main = async () => {
 
   httpLogger.info('pds is running')
 
-  pds.app.get("/tls-check", (req, res) => {
-    checkHandleRoute(pds, req, res);
-  });
+  // This route enables caddy to configure TLS for subdomains automatically
+  pds.app.get('/tls-check', (req, res) => {
+    checkHandleRoute(pds, req, res)
+  })
 
   // Graceful shutdown (see also https://aws.amazon.com/blogs/containers/graceful-shutdowns-with-ecs/)
   process.on('SIGTERM', async () => {
@@ -37,42 +38,42 @@ const main = async () => {
 async function checkHandleRoute(
   /** @type {PDS} */ pds,
   /** @type {import('express').Request} */ req,
-  /** @type {import('express').Response} */ res
+  /** @type {import('express').Response} */ res,
 ) {
   try {
-    const { domain } = req.query;
-    if (!domain || typeof domain !== "string") {
+    const { domain } = req.query
+    if (!domain || typeof domain !== 'string') {
       return res.status(400).json({
-        error: "InvalidRequest",
-        message: "bad or missing domain query param",
-      });
+        error: 'InvalidRequest',
+        message: 'bad or missing domain query param',
+      })
     }
     if (domain === pds.ctx.cfg.service.hostname) {
-      return res.json({ success: true });
+      return res.json({ success: true })
     }
     const isHostedHandle = pds.ctx.cfg.identity.serviceHandleDomains.find(
-      (avail) => domain.endsWith(avail)
-    );
+      (avail) => domain.endsWith(avail),
+    )
     if (!isHostedHandle) {
       return res.status(400).json({
-        error: "InvalidRequest",
-        message: "handles are not provided on this domain",
-      });
+        error: 'InvalidRequest',
+        message: 'handles are not provided on this domain',
+      })
     }
-    const account = await pds.ctx.accountManager.getAccount(domain);
+    const account = await pds.ctx.accountManager.getAccount(domain)
     if (!account) {
       return res.status(404).json({
-        error: "NotFound",
-        message: "handle not found for this domain",
-      });
+        error: 'NotFound',
+        message: 'handle not found for this domain',
+      })
     }
-    return res.json({ success: true });
+    return res.json({ success: true })
   } catch (err) {
-    httpLogger.error({ err }, "check handle failed");
+    httpLogger.error({ err }, 'check handle failed')
     return res.status(500).json({
-      error: "InternalServerError",
-      message: "Internal Server Error",
-    });
+      error: 'InternalServerError',
+      message: 'Internal Server Error',
+    })
   }
 }
 
