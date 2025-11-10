@@ -12665,60 +12665,6 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceBubble: {
-    lexicon: 1,
-    id: 'com.atproto.space.bubble',
-    description:
-      "Bubbles are interchangeable with Spaces. They break permission walking to enable more private 'spaces' in a more public 'space', both can be completely private as well. Requires auth, implemented by PDS.",
-    defs: {
-      main: {
-        type: 'record',
-        description:
-          "Bubbles are interchangeable with Spaces. They break permission walking to enable more private 'spaces' in a more public 'space', both can be completely private as well.",
-        key: 'any',
-        record: {
-          type: 'object',
-          properties: {
-            displayName: {
-              type: 'string',
-              maxGraphemes: 64,
-              maxLength: 640,
-            },
-            description: {
-              type: 'string',
-              description: 'Free-form profile description text.',
-              maxGraphemes: 256,
-              maxLength: 2560,
-            },
-            avatar: {
-              type: 'blob',
-              description:
-                "Small image to be displayed next to posts from account. AKA, 'profile picture'",
-              accept: ['image/png', 'image/jpeg'],
-              maxSize: 1000000,
-            },
-            banner: {
-              type: 'blob',
-              description:
-                'Larger horizontal image to display behind profile view.',
-              accept: ['image/png', 'image/jpeg'],
-              maxSize: 1000000,
-            },
-            labels: {
-              type: 'union',
-              description:
-                'Self-label values, specific to the Bluesky application, on the overall account.',
-              refs: ['lex:com.atproto.label.defs#selfLabels'],
-            },
-            createdAt: {
-              type: 'string',
-              format: 'datetime',
-            },
-          },
-        },
-      },
-    },
-  },
   ComAtprotoSpaceCheckPermission: {
     lexicon: 1,
     id: 'com.atproto.space.checkPermission',
@@ -12874,97 +12820,11 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceCreateBubble: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Create a new repository bubble, errors if it exists.',
-        auth: {
-          permission: 'bubble_create',
-          objectType: 'space',
-        },
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              repo: {
-                type: 'string',
-                description:
-                  'The handle or DID of the repo (aka, current account).',
-                format: 'at-identifier',
-                maxLength: 256,
-              },
-              parent: {
-                description:
-                  'The id of the parent space to nest under. If not set, the current value or /root is assumed. Can be used to move a space or bubble.',
-                type: 'string',
-                format: 'record-key',
-                maxLength: 64,
-              },
-              rkey: {
-                type: 'string',
-                description: 'The id of the space associated with the repo.',
-                format: 'record-key',
-                maxLength: 64,
-              },
-              record: {
-                type: 'unknown',
-                description: 'The record itself. Must contain a $type field.',
-              },
-              validate: {
-                type: 'boolean',
-                description:
-                  "Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.",
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-            },
-            required: ['repo', 'record'],
-          },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              uri: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              cid: {
-                type: 'string',
-                format: 'cid',
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-              validationStatus: {
-                type: 'string',
-                knownValues: ['valid', 'unknown'],
-              },
-              status: {
-                type: 'string',
-                description: 'a human readable status message',
-              },
-            },
-            required: ['uri', 'cid'],
-          },
-        },
-      },
-    },
-    description:
-      'Create a new repository bubble, errors if it exists. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.createBubble',
-  },
   ComAtprotoSpaceCreateGroup: {
     lexicon: 1,
+    id: 'com.atproto.space.createGroup',
+    description:
+      'Create a new repository group, errors if it exists. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13048,9 +12908,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Create a new repository group, errors if it exists. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.createGroup',
   },
   ComAtprotoSpaceCreateRecord: {
     lexicon: 1,
@@ -13059,22 +12916,22 @@ export const schemaDict = {
       'Create a new repository record, errors if it exists. Requires auth, implemented by PDS.',
     defs: {
       main: {
-        parameters: {
-          properties: {
-            collection: {
-              description: 'The NSID of the record type.',
-              format: 'nsid',
-              maxLength: 256,
-              type: 'string',
-            },
-          },
-          type: 'params',
-        },
         type: 'procedure',
         description: 'Create a new repository record, errors if it exists.',
         auth: {
           permission: 'record_create',
           objectType: 'space',
+        },
+        parameters: {
+          type: 'params',
+          properties: {
+            collection: {
+              type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
+              maxLength: 256,
+            },
+          },
         },
         input: {
           encoding: 'application/json',
@@ -13154,6 +13011,9 @@ export const schemaDict = {
   },
   ComAtprotoSpaceCreateRelation: {
     lexicon: 1,
+    id: 'com.atproto.space.createRelation',
+    description:
+      'Create a new repository relation, errors if it exists. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13237,12 +13097,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Create a new repository relation, errors if it exists. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.createRelation',
   },
   ComAtprotoSpaceCreateRole: {
     lexicon: 1,
+    id: 'com.atproto.space.createRole',
+    description:
+      'Create a new repository role, errors if it exists. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13326,12 +13186,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Create a new repository role, errors if it exists. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.createRole',
   },
   ComAtprotoSpaceCreateSpace: {
     lexicon: 1,
+    id: 'com.atproto.space.createSpace',
+    description:
+      'Create a new repository space, errors if it exists. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13415,9 +13275,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Create a new repository space, errors if it exists. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.createSpace',
   },
   ComAtprotoSpaceDeleteBlob: {
     lexicon: 1,
@@ -13477,73 +13334,11 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceDeleteBubble: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Delete a bubble and everything associated with it.',
-        auth: {
-          permission: 'bubble_delete',
-          objectType: 'bubble',
-        },
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              repo: {
-                type: 'string',
-                description:
-                  'The handle or DID of the repo (aka, current account).',
-                format: 'at-identifier',
-                maxLength: 256,
-              },
-              rkey: {
-                type: 'string',
-                format: 'record-key',
-                maxLength: 64,
-              },
-              swapCID: {
-                description:
-                  'Compare and swap with the previous record by CID.',
-                type: 'string',
-                format: 'cid',
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-            },
-            required: ['repo', 'rkey'],
-          },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              status: {
-                type: 'string',
-                description: 'a human readable status message',
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-            },
-          },
-        },
-      },
-    },
-    description:
-      'Delete a bubble and everything associated with it. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.deleteBubble',
-  },
   ComAtprotoSpaceDeleteGroup: {
     lexicon: 1,
+    id: 'com.atproto.space.deleteGroup',
+    description:
+      'Delete a group and everything associated with it. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13603,9 +13398,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Delete a group and everything associated with it. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.deleteGroup',
   },
   ComAtprotoSpaceDeleteRecord: {
     lexicon: 1,
@@ -13614,22 +13406,22 @@ export const schemaDict = {
       'Delete a record and everything associated with it. Requires auth, implemented by PDS.',
     defs: {
       main: {
-        parameters: {
-          properties: {
-            collection: {
-              description: 'The NSID of the record type.',
-              format: 'nsid',
-              maxLength: 256,
-              type: 'string',
-            },
-          },
-          type: 'params',
-        },
         type: 'procedure',
         description: 'Delete a record and everything associated with it.',
         auth: {
           permission: 'record_delete',
           objectType: 'record',
+        },
+        parameters: {
+          type: 'params',
+          properties: {
+            collection: {
+              type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
+              maxLength: 256,
+            },
+          },
         },
         input: {
           encoding: 'application/json',
@@ -13685,6 +13477,9 @@ export const schemaDict = {
   },
   ComAtprotoSpaceDeleteRelation: {
     lexicon: 1,
+    id: 'com.atproto.space.deleteRelation',
+    description:
+      'Delete a relation and everything associated with it. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13744,12 +13539,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Delete a relation and everything associated with it. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.deleteRelation',
   },
   ComAtprotoSpaceDeleteRole: {
     lexicon: 1,
+    id: 'com.atproto.space.deleteRole',
+    description:
+      'Delete a role and everything associated with it. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13809,12 +13604,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Delete a role and everything associated with it. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.deleteRole',
   },
   ComAtprotoSpaceDeleteSpace: {
     lexicon: 1,
+    id: 'com.atproto.space.deleteSpace',
+    description:
+      'Delete a space and everything associated with it. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -13874,87 +13669,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Delete a space and everything associated with it. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.deleteSpace',
-  },
-  ComAtprotoSpaceDescribeBubble: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get a bubble from a repository with extra information.',
-        auth: {
-          permission: 'bubble_get',
-          objectType: 'bubble',
-        },
-        parameters: {
-          type: 'params',
-          properties: {
-            repo: {
-              type: 'string',
-              description:
-                'The handle or DID of the repo (aka, current account).',
-              format: 'at-identifier',
-              maxLength: 256,
-            },
-            parent: {
-              type: 'string',
-              description: 'The id of the context space to operate under.',
-              format: 'record-key',
-              maxLength: 64,
-            },
-            rkey: {
-              type: 'string',
-              description: 'The id of the space.',
-              format: 'record-key',
-              maxLength: 64,
-            },
-            cid: {
-              type: 'string',
-              description:
-                'The CID of the version of the resource. If not specified, then return the most recent version.',
-              format: 'cid',
-            },
-            zookie: {
-              type: 'string',
-              description:
-                'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-            },
-          },
-          required: ['repo', 'rkey'],
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              uri: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              cid: {
-                description: 'The CID of the resource.',
-                type: 'string',
-                format: 'cid',
-              },
-              value: {
-                type: 'unknown',
-                description:
-                  'Some value, lexicon and implementation dependent.',
-              },
-            },
-            required: ['uri', 'value'],
-          },
-        },
-      },
-    },
-    description:
-      'Get a bubble from a repository with extra information. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.describeBubble',
   },
   ComAtprotoSpaceDescribeGroup: {
     lexicon: 1,
+    id: 'com.atproto.space.describeGroup',
+    description:
+      'Get a group from a repository with extra information. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14024,12 +13744,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a group from a repository with extra information. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.describeGroup',
   },
   ComAtprotoSpaceDescribeRole: {
     lexicon: 1,
+    id: 'com.atproto.space.describeRole',
+    description:
+      'Get a role from a repository with extra information. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14099,12 +13819,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a role from a repository with extra information. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.describeRole',
   },
   ComAtprotoSpaceDescribeSpace: {
     lexicon: 1,
+    id: 'com.atproto.space.describeSpace',
+    description:
+      'Get a space from a repository with extra information. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14174,9 +13894,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a space from a repository with extra information. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.describeSpace',
   },
   ComAtprotoSpaceGetBlob: {
     lexicon: 1,
@@ -14227,83 +13944,11 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceGetBubble: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'query',
-        description: 'Get a bubble from a repository.',
-        auth: {
-          permission: 'bubble_get',
-          objectType: 'bubble',
-        },
-        parameters: {
-          type: 'params',
-          properties: {
-            repo: {
-              type: 'string',
-              description:
-                'The handle or DID of the repo (aka, current account).',
-              format: 'at-identifier',
-              maxLength: 256,
-            },
-            parent: {
-              type: 'string',
-              description: 'The id of the context space to operate under.',
-              format: 'record-key',
-              maxLength: 64,
-            },
-            rkey: {
-              type: 'string',
-              description: 'The id of the space.',
-              format: 'record-key',
-              maxLength: 64,
-            },
-            cid: {
-              type: 'string',
-              description:
-                'The CID of the version of the resource. If not specified, then return the most recent version.',
-              format: 'cid',
-            },
-            zookie: {
-              type: 'string',
-              description:
-                'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-            },
-          },
-          required: ['repo', 'rkey'],
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              uri: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              cid: {
-                description: 'The CID of the resource.',
-                type: 'string',
-                format: 'cid',
-              },
-              value: {
-                type: 'unknown',
-                description:
-                  'Some value, lexicon and implementation dependent.',
-              },
-            },
-            required: ['uri', 'value'],
-          },
-        },
-      },
-    },
-    description:
-      'Get a bubble from a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.getBubble',
-  },
   ComAtprotoSpaceGetGroup: {
     lexicon: 1,
+    id: 'com.atproto.space.getGroup',
+    description:
+      'Get a group from a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14373,9 +14018,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a group from a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.getGroup',
   },
   ComAtprotoSpaceGetRecord: {
     lexicon: 1,
@@ -14384,18 +14026,20 @@ export const schemaDict = {
       'Get a record from a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
+        type: 'query',
+        description: 'Get a record from a repository.',
         auth: {
           permission: 'record_get',
           objectType: 'record',
         },
-        description: 'Get a record from a repository.',
         parameters: {
+          type: 'params',
           properties: {
             collection: {
-              description: 'The NSID of the record type.',
-              format: 'nsid',
-              maxLength: 256,
               type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
+              maxLength: 256,
             },
             repo: {
               type: 'string',
@@ -14429,9 +14073,7 @@ export const schemaDict = {
             },
           },
           required: ['repo', 'rkey'],
-          type: 'params',
         },
-        type: 'query',
         output: {
           encoding: 'application/json',
           schema: {
@@ -14460,6 +14102,9 @@ export const schemaDict = {
   },
   ComAtprotoSpaceGetRelation: {
     lexicon: 1,
+    id: 'com.atproto.space.getRelation',
+    description:
+      'Get a relation from a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14529,12 +14174,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a relation from a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.getRelation',
   },
   ComAtprotoSpaceGetRole: {
     lexicon: 1,
+    id: 'com.atproto.space.getRole',
+    description:
+      'Get a role from a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14604,12 +14249,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a role from a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.getRole',
   },
   ComAtprotoSpaceGetSpace: {
     lexicon: 1,
+    id: 'com.atproto.space.getSpace',
+    description:
+      'Get a space from a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -14679,9 +14324,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Get a space from a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.getSpace',
   },
   ComAtprotoSpaceGroup: {
     lexicon: 1,
@@ -14831,100 +14473,11 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceListBubbles: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'query',
-        description: 'List bubbles under a repository.',
-        auth: {
-          permission: 'bubble_list',
-          objectType: 'space',
-        },
-        parameters: {
-          type: 'params',
-          properties: {
-            repo: {
-              type: 'string',
-              description:
-                'The handle or DID of the repo (aka, current account).',
-              format: 'at-identifier',
-              maxLength: 256,
-            },
-            parent: {
-              type: 'string',
-              description: 'The id of the context space to operate under.',
-              format: 'record-key',
-              maxLength: 64,
-            },
-            limit: {
-              type: 'integer',
-              minimum: 1,
-              maximum: 100,
-              default: 50,
-              description: 'The number of records to return.',
-            },
-            cursor: {
-              type: 'string',
-            },
-            reverse: {
-              type: 'boolean',
-              description: 'Flag to reverse the order of the returned records.',
-            },
-            zookie: {
-              type: 'string',
-              description:
-                'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-            },
-          },
-          required: ['repo'],
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              cursor: {
-                type: 'string',
-              },
-              bubbles: {
-                type: 'array',
-                items: {
-                  type: 'ref',
-                  ref: 'lex:com.atproto.space.listBubbles#record',
-                },
-              },
-            },
-            required: ['bubbles'],
-          },
-        },
-      },
-      record: {
-        type: 'object',
-        properties: {
-          uri: {
-            type: 'string',
-            format: 'at-uri',
-          },
-          cid: {
-            description: 'The CID of the resource.',
-            type: 'string',
-            format: 'cid',
-          },
-          value: {
-            type: 'unknown',
-            description: 'Some value, lexicon and implementation dependent.',
-          },
-        },
-        required: ['uri', 'cid', 'value'],
-      },
-    },
-    description:
-      'List bubbles under a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.listBubbles',
-  },
   ComAtprotoSpaceListGroups: {
     lexicon: 1,
+    id: 'com.atproto.space.listGroups',
+    description:
+      'List groups under a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -15011,9 +14564,6 @@ export const schemaDict = {
         required: ['uri', 'cid', 'value'],
       },
     },
-    description:
-      'List groups under a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.listGroups',
   },
   ComAtprotoSpaceListMissingBlobs: {
     lexicon: 1,
@@ -15109,18 +14659,20 @@ export const schemaDict = {
       'List records under a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
+        type: 'query',
+        description: 'List records under a repository.',
         auth: {
           permission: 'record_list',
           objectType: 'space',
         },
-        description: 'List records under a repository.',
         parameters: {
+          type: 'params',
           properties: {
             collection: {
-              description: 'The NSID of the record type.',
-              format: 'nsid',
-              maxLength: 256,
               type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
+              maxLength: 256,
             },
             repo: {
               type: 'string',
@@ -15156,9 +14708,7 @@ export const schemaDict = {
             },
           },
           required: ['repo'],
-          type: 'params',
         },
-        type: 'query',
         output: {
           encoding: 'application/json',
           schema: {
@@ -15202,6 +14752,9 @@ export const schemaDict = {
   },
   ComAtprotoSpaceListRelations: {
     lexicon: 1,
+    id: 'com.atproto.space.listRelations',
+    description:
+      'List relations under a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -15288,12 +14841,12 @@ export const schemaDict = {
         required: ['uri', 'cid', 'value'],
       },
     },
-    description:
-      'List relations under a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.listRelations',
   },
   ComAtprotoSpaceListRoles: {
     lexicon: 1,
+    id: 'com.atproto.space.listRoles',
+    description:
+      'List roles under a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -15380,12 +14933,12 @@ export const schemaDict = {
         required: ['uri', 'cid', 'value'],
       },
     },
-    description:
-      'List roles under a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.listRoles',
   },
   ComAtprotoSpaceListSpaces: {
     lexicon: 1,
+    id: 'com.atproto.space.listSpaces',
+    description:
+      'List spaces under a repository. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'query',
@@ -15472,9 +15025,6 @@ export const schemaDict = {
         required: ['uri', 'cid', 'value'],
       },
     },
-    description:
-      'List spaces under a repository. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.listSpaces',
   },
   ComAtprotoSpaceLookupResources: {
     lexicon: 1,
@@ -15744,6 +15294,11 @@ export const schemaDict = {
         record: {
           type: 'object',
           properties: {
+            bubble: {
+              type: 'boolean',
+              description:
+                'Bubbles are private spaces to restrict access in a larger space. They reset the permission space so that outer permissions do not apply, except for owners from parent spaces.',
+            },
             displayName: {
               type: 'string',
               maxGraphemes: 64,
@@ -15784,102 +15339,11 @@ export const schemaDict = {
       },
     },
   },
-  ComAtprotoSpaceUpdateBubble: {
-    lexicon: 1,
-    defs: {
-      main: {
-        type: 'procedure',
-        description: 'Update an existing bubble, errors if it does not exist.',
-        auth: {
-          permission: 'bubble_update',
-          objectType: 'bubble',
-        },
-        input: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              repo: {
-                type: 'string',
-                description:
-                  'The handle or DID of the repo (aka, current account).',
-                format: 'at-identifier',
-                maxLength: 256,
-              },
-              parent: {
-                description:
-                  'The id of the parent space to nest under. If not set, the current value or /root is assumed. Can be used to move a space or bubble.',
-                type: 'string',
-                format: 'record-key',
-                maxLength: 64,
-              },
-              rkey: {
-                description: 'The id of the space.',
-                type: 'string',
-                format: 'record-key',
-                maxLength: 64,
-              },
-              record: {
-                type: 'unknown',
-                description: 'The record itself. Must contain a $type field.',
-              },
-              validate: {
-                type: 'boolean',
-                description:
-                  "Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.",
-              },
-              swapCID: {
-                description:
-                  'Compare and swap with the previous record by CID.',
-                type: 'string',
-                format: 'cid',
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-            },
-            required: ['repo', 'rkey', 'record'],
-          },
-        },
-        output: {
-          encoding: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              uri: {
-                type: 'string',
-                format: 'at-uri',
-              },
-              cid: {
-                type: 'string',
-                format: 'cid',
-              },
-              zookie: {
-                type: 'string',
-                description:
-                  'The Zanzibar/SpiceDB consistency token, very similar in intent to CIDs in ATProto.',
-              },
-              validationStatus: {
-                type: 'string',
-                knownValues: ['valid', 'unknown'],
-              },
-              status: {
-                type: 'string',
-                description: 'a human readable status message',
-              },
-            },
-          },
-        },
-      },
-    },
-    description:
-      'Update an existing bubble, errors if it does not exist. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.updateBubble',
-  },
   ComAtprotoSpaceUpdateGroup: {
     lexicon: 1,
+    id: 'com.atproto.space.updateGroup',
+    description:
+      'Update an existing group, errors if it does not exist. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -15968,9 +15432,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Update an existing group, errors if it does not exist. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.updateGroup',
   },
   ComAtprotoSpaceUpdateRecord: {
     lexicon: 1,
@@ -15979,22 +15440,22 @@ export const schemaDict = {
       'Update an existing record, errors if it does not exist. Requires auth, implemented by PDS.',
     defs: {
       main: {
-        parameters: {
-          properties: {
-            collection: {
-              description: 'The NSID of the record type.',
-              format: 'nsid',
-              maxLength: 256,
-              type: 'string',
-            },
-          },
-          type: 'params',
-        },
         type: 'procedure',
         description: 'Update an existing record, errors if it does not exist.',
         auth: {
           permission: 'record_update',
           objectType: 'record',
+        },
+        parameters: {
+          type: 'params',
+          properties: {
+            collection: {
+              type: 'string',
+              format: 'nsid',
+              description: 'The NSID of the record type.',
+              maxLength: 256,
+            },
+          },
         },
         input: {
           encoding: 'application/json',
@@ -16079,6 +15540,9 @@ export const schemaDict = {
   },
   ComAtprotoSpaceUpdateRelation: {
     lexicon: 1,
+    id: 'com.atproto.space.updateRelation',
+    description:
+      'Update an existing relation, errors if it does not exist. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -16168,12 +15632,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Update an existing relation, errors if it does not exist. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.updateRelation',
   },
   ComAtprotoSpaceUpdateRole: {
     lexicon: 1,
+    id: 'com.atproto.space.updateRole',
+    description:
+      'Update an existing role, errors if it does not exist. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -16262,12 +15726,12 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Update an existing role, errors if it does not exist. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.updateRole',
   },
   ComAtprotoSpaceUpdateSpace: {
     lexicon: 1,
+    id: 'com.atproto.space.updateSpace',
+    description:
+      'Update an existing space, errors if it does not exist. Requires auth, implemented by PDS.',
     defs: {
       main: {
         type: 'procedure',
@@ -16356,9 +15820,6 @@ export const schemaDict = {
         },
       },
     },
-    description:
-      'Update an existing space, errors if it does not exist. Requires auth, implemented by PDS.',
-    id: 'com.atproto.space.updateSpace',
   },
   ComAtprotoSpaceUploadBlob: {
     lexicon: 1,
@@ -23107,28 +22568,23 @@ export const ids = {
   ComAtprotoServerResetPassword: 'com.atproto.server.resetPassword',
   ComAtprotoServerRevokeAppPassword: 'com.atproto.server.revokeAppPassword',
   ComAtprotoServerUpdateEmail: 'com.atproto.server.updateEmail',
-  ComAtprotoSpaceBubble: 'com.atproto.space.bubble',
   ComAtprotoSpaceCheckPermission: 'com.atproto.space.checkPermission',
   ComAtprotoSpaceCheckPermissions: 'com.atproto.space.checkPermissions',
-  ComAtprotoSpaceCreateBubble: 'com.atproto.space.createBubble',
   ComAtprotoSpaceCreateGroup: 'com.atproto.space.createGroup',
   ComAtprotoSpaceCreateRecord: 'com.atproto.space.createRecord',
   ComAtprotoSpaceCreateRelation: 'com.atproto.space.createRelation',
   ComAtprotoSpaceCreateRole: 'com.atproto.space.createRole',
   ComAtprotoSpaceCreateSpace: 'com.atproto.space.createSpace',
   ComAtprotoSpaceDeleteBlob: 'com.atproto.space.deleteBlob',
-  ComAtprotoSpaceDeleteBubble: 'com.atproto.space.deleteBubble',
   ComAtprotoSpaceDeleteGroup: 'com.atproto.space.deleteGroup',
   ComAtprotoSpaceDeleteRecord: 'com.atproto.space.deleteRecord',
   ComAtprotoSpaceDeleteRelation: 'com.atproto.space.deleteRelation',
   ComAtprotoSpaceDeleteRole: 'com.atproto.space.deleteRole',
   ComAtprotoSpaceDeleteSpace: 'com.atproto.space.deleteSpace',
-  ComAtprotoSpaceDescribeBubble: 'com.atproto.space.describeBubble',
   ComAtprotoSpaceDescribeGroup: 'com.atproto.space.describeGroup',
   ComAtprotoSpaceDescribeRole: 'com.atproto.space.describeRole',
   ComAtprotoSpaceDescribeSpace: 'com.atproto.space.describeSpace',
   ComAtprotoSpaceGetBlob: 'com.atproto.space.getBlob',
-  ComAtprotoSpaceGetBubble: 'com.atproto.space.getBubble',
   ComAtprotoSpaceGetGroup: 'com.atproto.space.getGroup',
   ComAtprotoSpaceGetRecord: 'com.atproto.space.getRecord',
   ComAtprotoSpaceGetRelation: 'com.atproto.space.getRelation',
@@ -23136,7 +22592,6 @@ export const ids = {
   ComAtprotoSpaceGetSpace: 'com.atproto.space.getSpace',
   ComAtprotoSpaceGroup: 'com.atproto.space.group',
   ComAtprotoSpaceListBlobs: 'com.atproto.space.listBlobs',
-  ComAtprotoSpaceListBubbles: 'com.atproto.space.listBubbles',
   ComAtprotoSpaceListGroups: 'com.atproto.space.listGroups',
   ComAtprotoSpaceListMissingBlobs: 'com.atproto.space.listMissingBlobs',
   ComAtprotoSpaceListRecords: 'com.atproto.space.listRecords',
@@ -23148,7 +22603,6 @@ export const ids = {
   ComAtprotoSpaceRelation: 'com.atproto.space.relation',
   ComAtprotoSpaceRole: 'com.atproto.space.role',
   ComAtprotoSpaceSpace: 'com.atproto.space.space',
-  ComAtprotoSpaceUpdateBubble: 'com.atproto.space.updateBubble',
   ComAtprotoSpaceUpdateGroup: 'com.atproto.space.updateGroup',
   ComAtprotoSpaceUpdateRecord: 'com.atproto.space.updateRecord',
   ComAtprotoSpaceUpdateRelation: 'com.atproto.space.updateRelation',

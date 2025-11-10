@@ -1,24 +1,23 @@
-import { InvalidRecordKeyError } from "@atproto/syntax";
-import { InvalidRequestError } from "@atproto/xrpc-server";
-import { AppContext } from "../../../../context";
-import { Server } from "../../../../lexicon";
-import * as LEX from "../../../../lexicon/lexicons";
-import { AtUri } from "@atproto/syntax";
-import { touchRelationship } from "../../../../authz/spicedb";
+import { AtUri, InvalidRecordKeyError } from '@atproto/syntax'
+import { InvalidRequestError } from '@atproto/xrpc-server'
+import { ActorStoreTransactor } from '../../../../actor-store/actor-store-transactor'
+import { touchRelationship } from '../../../../authz/spicedb'
+import { AppContext } from '../../../../context'
+import { Server } from '../../../../lexicon'
+import * as LEX from '../../../../lexicon/lexicons'
 import {
+  BadCommitSwapError,
+  InvalidRecordError,
+  PreparedCreate,
   atproto2spicedb,
   aturi2spicedb,
   checkPermission,
   dualWriteTransaction,
   preflightChecks,
-  BadCommitSwapError,
-  InvalidRecordError,
-  PreparedCreate,
   prepareCreate,
   prepareDelete,
-} from "../../../../space";
-import { ActorStoreTransactor } from "../../../../actor-store/actor-store-transactor";
-import { assertSpice } from "./utils";
+} from '../../../../space'
+import { assertSpice } from './utils'
 
 // <no value>
 
@@ -41,34 +40,34 @@ export default function (server: Server, ctx: AppContext) {
 
     rateLimit: [
       {
-        name: "repo-read-hour",
+        name: 'repo-read-hour',
         calcKey: ({ auth }) => auth.credentials.did,
         calcPoints: () => 1,
       },
       {
-        name: "repo-read-day",
+        name: 'repo-read-day',
         calcKey: ({ auth }) => auth.credentials.did,
         calcPoints: () => 1,
       },
     ],
 
     handler: async ({ auth, params }) => {
-      assertSpice(ctx);
+      assertSpice(ctx)
 
-      const label = "describeSpace";
+      const label = 'describeSpace'
 
-      let reqDid: string;
-      let reqDidSid: string;
-      let repoDid: string;
-      let repoDidSid: string;
-      let space: string;
-      let spaceSid: string;
-      let spaceType: string = "invalid";
+      let reqDid: string
+      let reqDidSid: string
+      let repoDid: string
+      let repoDidSid: string
+      let space: string
+      let spaceSid: string
+      let spaceType: string = 'invalid'
 
       try {
         // deconstruct params
-        console.log(`${label}.params:`, params);
-        var { cid, parent, repo, rkey, zookie } = params;
+        console.log(`${label}.params:`, params)
+        var { cid, parent, repo, rkey, zookie } = params
 
         // validation ... add as needed
 
@@ -79,14 +78,14 @@ export default function (server: Server, ctx: AppContext) {
           // the space we embed in
           repo,
           space: parent,
-          collection: "<change-me>",
+          collection: '<change-me>',
           rkey: rkey,
           record: {},
-        });
-        reqDid = preflight.reqDid;
-        repoDid = preflight.repoDid;
-        space = preflight.space;
-        rkey = preflight.rkey;
+        })
+        reqDid = preflight.reqDid
+        repoDid = preflight.repoDid
+        space = preflight.space
+        rkey = preflight.rkey
 
         //
         // check permissions
@@ -95,48 +94,48 @@ export default function (server: Server, ctx: AppContext) {
         // we need to look up the "space" to see if it is a space or bubble
         // you may also want to do the same for any other context that is relevant
         // to the xrpc handler business logic
-        var currSpace: any = null;
+        let currSpace: any = null
         await ctx.actorStore.transact(repoDid, async (actorTxn) => {
           const suri = AtUri.make(
             repoDid,
-            "com.atproto.space.space",
-            "self",
+            'com.atproto.space.space',
+            'self',
             space,
-          );
-          currSpace = await actorTxn.space.getRecord(suri, null);
-          spaceType = "space";
+          )
+          currSpace = await actorTxn.space.getRecord(suri, null)
+          spaceType = 'space'
           if (currSpace === null) {
             const buri = AtUri.make(
               repoDid,
-              "com.atproto.space.bubble",
-              "self",
+              'com.atproto.space.bubble',
+              'self',
               space,
-            );
-            currSpace = await actorTxn.space.getRecord(buri, null);
-            spaceType = "bubble";
+            )
+            currSpace = await actorTxn.space.getRecord(buri, null)
+            spaceType = 'bubble'
           }
-        });
+        })
         if (currSpace === null) {
           // return error
           // TODO ensure we return similar errors
           throw new InvalidRequestError(
-            "unauthenticated, insufficient permissions, or unknown parent",
-          );
+            'unauthenticated, insufficient permissions, or unknown parent',
+          )
         }
-        console.log("currSpace.space:", JSON.stringify(currSpace, null, "  "));
-        const currUri = new AtUri(currSpace.uri);
+        console.log('currSpace.space:', JSON.stringify(currSpace, null, '  '))
+        const currUri = new AtUri(currSpace.uri)
 
         // TODO, support more subject kinds, need to base on auth.credentials.type
-        let reqSubjectType = "acct";
-        reqDidSid = atproto2spicedb(reqDid);
-        repoDidSid = atproto2spicedb(repoDid);
-        spaceSid = atproto2spicedb(space);
+        const reqSubjectType = 'acct'
+        reqDidSid = atproto2spicedb(reqDid)
+        repoDidSid = atproto2spicedb(repoDid)
+        spaceSid = atproto2spicedb(space)
 
         // what we are checking permission wise? (needs to be set per xrpc handler, perhaps set in the lexicon?)
         // not sure this makes sense as named in the lexicon doc, i.e. group, the objectType is space or bubble
         // can bubble be a boolean on a space, and only different in spicedb?
         // select one of
-        let objectType = "space";
+        const objectType = 'space'
         // let objectType = "invalid";
         // if (currUri.collection === "com.atproto.space.space") {
         //   objectType = "space";
@@ -145,7 +144,7 @@ export default function (server: Server, ctx: AppContext) {
         //   objectType = "bubble";
         // }
         // NOTE, you may need to add more path parts to the resource id, for pretty much
-        let objectId = `${repoDidSid}/${spaceSid}`;
+        const objectId = `${repoDidSid}/${spaceSid}`
 
         // TODO, caveats for records, but probably only
 
@@ -154,25 +153,25 @@ export default function (server: Server, ctx: AppContext) {
           auth,
           subjectType: reqSubjectType,
           subjectId: reqDidSid,
-          permission: "space_get",
+          permission: 'space_get',
           objectType,
           objectId,
           collectionOp: LEX.ids.ComAtprotoSpaceDescribeSpace,
           // TODO, pass zookie (and consistency mode?)
           // TODO, pass caveats? (maybe only needed on com.atproto.space.record)
-        });
+        })
       } catch (err) {
-        console.error(err);
+        console.error(err)
         if (
           err instanceof InvalidRecordError ||
           err instanceof InvalidRecordKeyError
         ) {
           throw new InvalidRequestError(
-            "unauthenticated, insufficient permissions, or unknown parent",
-          );
+            'unauthenticated, insufficient permissions, or unknown parent',
+          )
           // throw new InvalidRequestError(err.message)
         }
-        throw err;
+        throw err
       }
 
       //
@@ -185,13 +184,13 @@ export default function (server: Server, ctx: AppContext) {
 
       // relation record(s)
 
-      const aturi = AtUri.make(repo, "com.atproto.space.space", "self", rkey)
+      const aturi = AtUri.make(repo, 'com.atproto.space.space', 'self', rkey)
       const uri = aturi.toString()
-      var dbSpace: any = {}
-      var spaces: string[] = []
-      var bubbles: string[] = []
-      var groups: string[] = []
-      var collections: string[] = []
+      let dbSpace: any = {}
+      let spaces: string[] = []
+      let roles: string[] = []
+      let groups: string[] = []
+      let collections: string[] = []
 
       //
       // DUAL WRITE PROBLEM
@@ -211,7 +210,7 @@ export default function (server: Server, ctx: AppContext) {
           // TODO (20251102) list filter the spicedb way
           dbSpace = await actorTxn.space.getRecord(aturi, cid || null)
           spaces = await actorTxn.space.listSpaces(space)
-          bubbles = await actorTxn.space.listBubbles(space)
+          roles = await actorTxn.space.listRoles(space)
           groups = await actorTxn.space.listGroups(space)
           collections = await actorTxn.space.listCollections(space)
         },
@@ -220,14 +219,14 @@ export default function (server: Server, ctx: AppContext) {
         authzOps: async (spicedbClient) => {
           // call SpiceDB client here
         },
-      });
+      })
 
       // TODO, (DWP/3) background reconciliation process
 
       const value = {
         space: dbSpace,
         spaces,
-        bubbles,
+        roles,
         groups,
         collections,
       }
@@ -237,12 +236,12 @@ export default function (server: Server, ctx: AppContext) {
         cid: dbSpace.cid,
         uri,
         value,
-      };
-      console.log("resp.body", JSON.stringify(body, null, "  "));
+      }
+      console.log('resp.body', JSON.stringify(body, null, '  '))
       return {
-        encoding: "application/json",
+        encoding: 'application/json',
         body,
-      };
+      }
     },
-  });
+  })
 }

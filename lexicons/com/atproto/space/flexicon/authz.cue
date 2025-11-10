@@ -6,6 +6,38 @@ import (
 
 lexicon: {
 
+  // dualWrite: defs: main: lexicons.#Procedure & {
+  //   // metadata
+  //   description: "Bulk write records and permissions safely."
+  //   auth: {
+  //     permission: "<dummy>"
+  //     objectType: string | *"space"
+  //   }
+
+  //   input: schema: {
+  //     required: ["repo", "record"]
+  //     properties: {
+  //       records: [...]
+  //       relations: [...]
+  //     }
+  //   }
+
+  //   output: schema: {
+  //     required: ["uri", "cid"]
+  //     properties: {
+  //       records: [...{
+  //         uri: shared.properties.uri
+  //         cid: shared.properties.uri
+  //         validationStatus: shared.properties.validationStatus
+  //       }]
+  //       // how to map records to relation inputs?
+  //       relations: [...{
+  //         zookie: shared.properties.zookie
+  //       }]
+  //     }
+  //   }
+  // }
+
   checkPermission: defs: main: lexicons.#Query & {
     description: "Check if the permission is allowed."
 

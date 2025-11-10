@@ -16,39 +16,20 @@ lexicon: {
     description: "Spaces are nesting sets of groups, roles, content, and their relations."
     key: "any"
 
-    record: properties: shared.tbdProperties
+    record: properties: shared.tbdProperties & {
+      bubble: shared.properties.bubble
+    }
   }
 
   // embed the default crud
   _spaceCrud: #crud & { #resource: "space" }
+  _spaceMembers: #membership & { #resource: "space" }
   getSpace: _spaceCrud.getSpace
   describeSpace: _spaceCrud.describeSpace
   listSpaces: _spaceCrud.listSpaces
   createSpace: _spaceCrud.createSpace
   updateSpace: _spaceCrud.updateSpace
   deleteSpace: _spaceCrud.deleteSpace
-
-  //
-  // Bubble
-  //
-
-  // record
-  bubble: defs: main: lexicons.#Record & {
-    description: "Bubbles are interchangeable with Spaces. They break permission walking to enable more private 'spaces' in a more public 'space', both can be completely private as well."
-    key: "any"
-
-    record: properties: shared.tbdProperties
-  }
-
-  // embed the default crud
-  _bubbleCrud: #crud & { #resource: "bubble" }
-  getBubble: _bubbleCrud.getBubble
-  describeBubble: _bubbleCrud.describeBubble
-  listBubbles: _bubbleCrud.listBubbles
-  createBubble: _bubbleCrud.createBubble
-  updateBubble: _bubbleCrud.updateBubble
-  deleteBubble: _bubbleCrud.deleteBubble
-
 
   //
   // Group

@@ -17,6 +17,8 @@ const id = 'com.atproto.space.space'
 
 export interface Main {
   $type: 'com.atproto.space.space'
+  /** Bubbles are private spaces to restrict access in a larger space. They reset the permission space so that outer permissions do not apply, except for owners from parent spaces. */
+  bubble?: boolean
   displayName?: string
   /** Free-form profile description text. */
   description?: string

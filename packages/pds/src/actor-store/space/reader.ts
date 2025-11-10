@@ -5,10 +5,10 @@ import * as syntax from '@atproto/syntax'
 import { AtUri, ensureValidAtUri } from '@atproto/syntax'
 import { countAll, notSoftDeletedClause } from '../../db/util'
 import { ids } from '../../lexicon/lexicons'
-import { Record as SpaceRecord } from '../../lexicon/types/com/atproto/space/space'
 import { Record as ProfileRecord } from '../../lexicon/types/app/bsky/actor/profile'
 import { Record as PostRecord } from '../../lexicon/types/app/bsky/feed/post'
 import { StatusAttr } from '../../lexicon/types/com/atproto/admin/defs'
+import { Record as SpaceRecord } from '../../lexicon/types/com/atproto/space/space'
 import { LocalRecords } from '../../read-after-write/types'
 import { ActorDb, Backlink } from '../db'
 
@@ -63,12 +63,12 @@ export class SpaceReader {
     return spaces.map((row) => row.uri)
   }
 
-  async listBubbles(parent: string): Promise<string[]> {
+  async listRoles(parent: string): Promise<string[]> {
     const spaces = await this.db.db
       .selectFrom('space')
       .select('uri')
       .where('parent', '=', parent)
-      .where('collection', '=', ids.ComAtprotoSpaceBubble)
+      .where('collection', '=', ids.ComAtprotoSpaceRole)
       .execute()
     return spaces.map((row) => row.uri)
   }

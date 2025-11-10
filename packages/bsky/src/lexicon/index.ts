@@ -184,32 +184,27 @@ import * as ComAtprotoServerRevokeAppPassword from './types/com/atproto/server/r
 import * as ComAtprotoServerUpdateEmail from './types/com/atproto/server/updateEmail.js'
 import * as ComAtprotoSpaceCheckPermission from './types/com/atproto/space/checkPermission.js'
 import * as ComAtprotoSpaceCheckPermissions from './types/com/atproto/space/checkPermissions.js'
-import * as ComAtprotoSpaceCreateBubble from './types/com/atproto/space/createBubble.js'
 import * as ComAtprotoSpaceCreateGroup from './types/com/atproto/space/createGroup.js'
 import * as ComAtprotoSpaceCreateRecord from './types/com/atproto/space/createRecord.js'
 import * as ComAtprotoSpaceCreateRelation from './types/com/atproto/space/createRelation.js'
 import * as ComAtprotoSpaceCreateRole from './types/com/atproto/space/createRole.js'
 import * as ComAtprotoSpaceCreateSpace from './types/com/atproto/space/createSpace.js'
 import * as ComAtprotoSpaceDeleteBlob from './types/com/atproto/space/deleteBlob.js'
-import * as ComAtprotoSpaceDeleteBubble from './types/com/atproto/space/deleteBubble.js'
 import * as ComAtprotoSpaceDeleteGroup from './types/com/atproto/space/deleteGroup.js'
 import * as ComAtprotoSpaceDeleteRecord from './types/com/atproto/space/deleteRecord.js'
 import * as ComAtprotoSpaceDeleteRelation from './types/com/atproto/space/deleteRelation.js'
 import * as ComAtprotoSpaceDeleteRole from './types/com/atproto/space/deleteRole.js'
 import * as ComAtprotoSpaceDeleteSpace from './types/com/atproto/space/deleteSpace.js'
-import * as ComAtprotoSpaceDescribeBubble from './types/com/atproto/space/describeBubble.js'
 import * as ComAtprotoSpaceDescribeGroup from './types/com/atproto/space/describeGroup.js'
 import * as ComAtprotoSpaceDescribeRole from './types/com/atproto/space/describeRole.js'
 import * as ComAtprotoSpaceDescribeSpace from './types/com/atproto/space/describeSpace.js'
 import * as ComAtprotoSpaceGetBlob from './types/com/atproto/space/getBlob.js'
-import * as ComAtprotoSpaceGetBubble from './types/com/atproto/space/getBubble.js'
 import * as ComAtprotoSpaceGetGroup from './types/com/atproto/space/getGroup.js'
 import * as ComAtprotoSpaceGetRecord from './types/com/atproto/space/getRecord.js'
 import * as ComAtprotoSpaceGetRelation from './types/com/atproto/space/getRelation.js'
 import * as ComAtprotoSpaceGetRole from './types/com/atproto/space/getRole.js'
 import * as ComAtprotoSpaceGetSpace from './types/com/atproto/space/getSpace.js'
 import * as ComAtprotoSpaceListBlobs from './types/com/atproto/space/listBlobs.js'
-import * as ComAtprotoSpaceListBubbles from './types/com/atproto/space/listBubbles.js'
 import * as ComAtprotoSpaceListGroups from './types/com/atproto/space/listGroups.js'
 import * as ComAtprotoSpaceListMissingBlobs from './types/com/atproto/space/listMissingBlobs.js'
 import * as ComAtprotoSpaceListRecords from './types/com/atproto/space/listRecords.js'
@@ -218,7 +213,6 @@ import * as ComAtprotoSpaceListRoles from './types/com/atproto/space/listRoles.j
 import * as ComAtprotoSpaceListSpaces from './types/com/atproto/space/listSpaces.js'
 import * as ComAtprotoSpaceLookupResources from './types/com/atproto/space/lookupResources.js'
 import * as ComAtprotoSpaceLookupSubjects from './types/com/atproto/space/lookupSubjects.js'
-import * as ComAtprotoSpaceUpdateBubble from './types/com/atproto/space/updateBubble.js'
 import * as ComAtprotoSpaceUpdateGroup from './types/com/atproto/space/updateGroup.js'
 import * as ComAtprotoSpaceUpdateRecord from './types/com/atproto/space/updateRecord.js'
 import * as ComAtprotoSpaceUpdateRelation from './types/com/atproto/space/updateRelation.js'
@@ -2655,18 +2649,6 @@ export class ComAtprotoSpaceNS {
     return this._server.xrpc.method(nsid, cfg)
   }
 
-  createBubble<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceCreateBubble.QueryParams,
-      ComAtprotoSpaceCreateBubble.HandlerInput,
-      ComAtprotoSpaceCreateBubble.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.createBubble' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
   createGroup<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2739,18 +2721,6 @@ export class ComAtprotoSpaceNS {
     return this._server.xrpc.method(nsid, cfg)
   }
 
-  deleteBubble<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceDeleteBubble.QueryParams,
-      ComAtprotoSpaceDeleteBubble.HandlerInput,
-      ComAtprotoSpaceDeleteBubble.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.deleteBubble' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
   deleteGroup<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2811,18 +2781,6 @@ export class ComAtprotoSpaceNS {
     return this._server.xrpc.method(nsid, cfg)
   }
 
-  describeBubble<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceDescribeBubble.QueryParams,
-      ComAtprotoSpaceDescribeBubble.HandlerInput,
-      ComAtprotoSpaceDescribeBubble.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.describeBubble' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
   describeGroup<A extends Auth = void>(
     cfg: MethodConfigOrHandler<
       A,
@@ -2868,18 +2826,6 @@ export class ComAtprotoSpaceNS {
     >,
   ) {
     const nsid = 'com.atproto.space.getBlob' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  getBubble<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceGetBubble.QueryParams,
-      ComAtprotoSpaceGetBubble.HandlerInput,
-      ComAtprotoSpaceGetBubble.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.getBubble' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 
@@ -2952,18 +2898,6 @@ export class ComAtprotoSpaceNS {
     >,
   ) {
     const nsid = 'com.atproto.space.listBlobs' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  listBubbles<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceListBubbles.QueryParams,
-      ComAtprotoSpaceListBubbles.HandlerInput,
-      ComAtprotoSpaceListBubbles.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.listBubbles' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 
@@ -3060,18 +2994,6 @@ export class ComAtprotoSpaceNS {
     >,
   ) {
     const nsid = 'com.atproto.space.lookupSubjects' // @ts-ignore
-    return this._server.xrpc.method(nsid, cfg)
-  }
-
-  updateBubble<A extends Auth = void>(
-    cfg: MethodConfigOrHandler<
-      A,
-      ComAtprotoSpaceUpdateBubble.QueryParams,
-      ComAtprotoSpaceUpdateBubble.HandlerInput,
-      ComAtprotoSpaceUpdateBubble.HandlerOutput
-    >,
-  ) {
-    const nsid = 'com.atproto.space.updateBubble' // @ts-ignore
     return this._server.xrpc.method(nsid, cfg)
   }
 

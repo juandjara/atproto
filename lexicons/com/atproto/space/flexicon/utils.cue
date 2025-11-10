@@ -54,6 +54,10 @@ shared: {
     returnCID: cid & {
       description: "The CID of the resource."
     }
+    bubble: {
+      type: "boolean"
+      description: "Bubbles are private spaces to restrict access in a larger space. They reset the permission space so that outer permissions do not apply, except for owners from parent spaces."
+    }
     validate: {
       type: "boolean"
       description: "Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons."
